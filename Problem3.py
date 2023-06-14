@@ -1,5 +1,5 @@
 # Problem 3: GAN
-In this problem, we will train a generative adversarial network (GAN) to generate new celebrities after showing it pictures of many real celebrities. 
+# In this problem, we will train a generative adversarial network (GAN) to generate new celebrities after showing it pictures of many real celebrities. 
 import torch
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ print(f"Is MPS available? {torch.backends.mps.is_available()}")
 # Set the device      
 device = "mps" if torch.backends.mps.is_available() else "cpu"
 print(f"Using device: {device}")
-%matplotlib inline
+# %matplotlib inline
 
 from __future__ import print_function
 
@@ -44,32 +44,32 @@ random.seed(manualSeed)
 torch.manual_seed(manualSeed)
 ### (a) Prepare CelebA Dataset
 
-we will use the [Celeb-A Faces
-dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) which can
-be downloaded from the [link](https://drive.google.com/file/d/1JgNzlZKQVlVwmlVx-5y6m4Dftbia51YB/view?usp=sharing).
-The dataset will download as a file named `img_align_celeba.zip`. Once
-downloaded, create a directory named `CelebA` and extract the zip file
-into that directory. Then, set the `dataroot` input for this notebook to
-the `CelebA` directory you just created. The resulting directory
-structure should be:
+# we will use the [Celeb-A Faces
+# dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) which can
+# be downloaded from the [link](https://drive.google.com/file/d/1JgNzlZKQVlVwmlVx-5y6m4Dftbia51YB/view?usp=sharing).
+# The dataset will download as a file named `img_align_celeba.zip`. Once
+# downloaded, create a directory named `CelebA` and extract the zip file
+# into that directory. Then, set the `dataroot` input for this notebook to
+# the `CelebA` directory you just created. The resulting directory
+# structure should be:
 
-```
-   /path/to/CelebA
-       -> img_align_celeba  
-           -> 188242.jpg
-           -> 173822.jpg
-           -> 284702.jpg
-           -> 537394.jpg
-              ...
-```
+# ```
+#    /path/to/CelebA
+#        -> img_align_celeba  
+#            -> 188242.jpg
+#            -> 173822.jpg
+#            -> 284702.jpg
+#            -> 537394.jpg
+#               ...
+# ```
 
-This is an important step because we will be using the ImageFolder
-dataset class, which requires there to be subdirectories in the
-dataset’s root folder. 
-!gdown --fuzzy https://drive.google.com/file/d/0B7EVK8r0v71pZjFTYXZWM3FlRnM/view?usp=share_link&resourcekey=0-dYn9z10tMJOBAkviAcfdyQ img_align_celeba.zip
-!mkdir ./CelebA
-!unzip ./content/img_align_celeba.zip -d ./CelebA
-Set parameters for the implemented network.
+# This is an important step because we will be using the ImageFolder
+# dataset class, which requires there to be subdirectories in the
+# dataset’s root folder. 
+# !gdown --fuzzy https://drive.google.com/file/d/0B7EVK8r0v71pZjFTYXZWM3FlRnM/view?usp=share_link&resourcekey=0-dYn9z10tMJOBAkviAcfdyQ img_align_celeba.zip
+# !mkdir ./CelebA
+# !unzip ./content/img_align_celeba.zip -d ./CelebA
+# Set parameters for the implemented network.
 # Root directory for dataset
 dataroot = "./CelebA"
 # Number of workers for dataloader
@@ -86,9 +86,9 @@ nz = 100
 lr = 0.0005
 # Beta1 hyperparam for Adam optimizers
 beta1 = 0.5
-Now, we can create the dataset, create the
-dataloader, set the device to run on, and finally visualize some of the
-training data.
+# Now, we can create the dataset, create the
+# dataloader, set the device to run on, and finally visualize some of the
+# training data.
 
 
 # We can use an image folder dataset the way we have it setup.
@@ -118,7 +118,7 @@ plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[192:], padding
 
 #### 1. Weight Initialization 
 
-All model weights in GAN should be randomly initialized from a Normal distribution with `mean = 0`, `stdev = 0.02`. The ``weights_init`` function takes an initialized model as input and reinitializes all convolutional, convolutional-transpose, and batch normalization layers to meet this criteria. This function is applied to the models immediately after initialization.
+# All model weights in GAN should be randomly initialized from a Normal distribution with `mean = 0`, `stdev = 0.02`. The ``weights_init`` function takes an initialized model as input and reinitializes all convolutional, convolutional-transpose, and batch normalization layers to meet this criteria. This function is applied to the models immediately after initialization.
 # custom weights initialization called on netG and netD
 def weights_init(m):
   classname = m.__class__.__name__
@@ -129,14 +129,14 @@ def weights_init(m):
     nn.init.constant_(m.bias.data, 0)
 #### 2. Generator
 
-The generator $G$, is designed to map the latent space vector
-$z$ to data-space. Since our data are images, converting
-$z$ to data-space means ultimately creating an RGB image with the
-same size as the training images (i.e. 3x64x64). In practice, this is
-accomplished through a series of strided two dimensional convolutional
-transpose layers, each paired with a 2D batch norm layer and a relu
-activation. The output of the generator is fed through a tanh function
-to return it to the input data range of $[-1,1]$. 
+# The generator $G$, is designed to map the latent space vector
+# $z$ to data-space. Since our data are images, converting
+# $z$ to data-space means ultimately creating an RGB image with the
+# same size as the training images (i.e. 3x64x64). In practice, this is
+# accomplished through a series of strided two dimensional convolutional
+# transpose layers, each paired with a 2D batch norm layer and a relu
+# activation. The output of the generator is fed through a tanh function
+# to return it to the input data range of $[-1,1]$. 
 class Generator(nn.Module):
   def __init__(self, latent_dim=100):
     super(Generator, self).__init__()
@@ -176,14 +176,14 @@ netG.apply(weights_init)
 print(netG)
 #### 3. Discriminator
 
-The discriminator $D$ is a binary classification
-network that takes an image as input and outputs a scalar probability
-that the input image is real (as opposed to fake). Here, $D$ takes
-a 3x64x64 input image, processes it through a series of Conv2d,
-BatchNorm2d, and ReLU layers, and outputs the final probability
-through a Sigmoid activation function. This architecture can be extended
-with more layers if necessary for the problem, but there is significance
-to the use of the strided convolution, BatchNorm, and ReLUs. 
+# The discriminator $D$ is a binary classification
+# network that takes an image as input and outputs a scalar probability
+# that the input image is real (as opposed to fake). Here, $D$ takes
+# a 3x64x64 input image, processes it through a series of Conv2d,
+# BatchNorm2d, and ReLU layers, and outputs the final probability
+# through a Sigmoid activation function. This architecture can be extended
+# with more layers if necessary for the problem, but there is significance
+# to the use of the strided convolution, BatchNorm, and ReLUs. 
 
 class Discriminator(nn.Module):
   def __init__(self):
@@ -221,21 +221,21 @@ netD.apply(weights_init)
 print(netD)
 #### Loss Functions and Optimizers
 
-With $D$ and $G$ setup, we can specify how they learn
-through the loss functions and optimizers. We will use the Binary Cross
-Entropy loss
-([`BCELoss`](https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss))
-function which is defined in PyTorch as:
+# With $D$ and $G$ setup, we can specify how they learn
+# through the loss functions and optimizers. We will use the Binary Cross
+# Entropy loss
+# ([`BCELoss`](https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss))
+# function which is defined in PyTorch as:
 
-\begin{align}\ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad l_n = - \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right]\end{align}
+# \begin{align}\ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad l_n = - \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right]\end{align}
 
-Notice how this function provides the calculation of both log components
-in the objective function (i.e. $\log(D(x))$ and
-$\log(1-D(G(z)))$). We can specify what part of the BCE equation to
-use with the $y$ input. This is accomplished in the training loop
-which is coming up soon, but it is important to understand how we can
-choose which component we wish to calculate just by changing $y$
-(i.e. GT labels).
+# Notice how this function provides the calculation of both log components
+# in the objective function (i.e. $\log(D(x))$ and
+# $\log(1-D(G(z)))$). We can specify what part of the BCE equation to
+# use with the $y$ input. This is accomplished in the training loop
+# which is coming up soon, but it is important to understand how we can
+# choose which component we wish to calculate just by changing $y$
+# (i.e. GT labels).
 # Initialize BCELoss function
 criterion = nn.BCELoss()
 
@@ -253,68 +253,68 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 #### 5. Training Loop
 
 
-Finally, now that we have all of the parts of the GAN framework defined,
-we can train it. Be mindful that training GANs is somewhat of an art
-form, as incorrect hyperparameter settings lead to mode collapse with
-little explanation of what went wrong. Here, we will closely follow
-Algorithm 1 from Goodfellow’s paper, while abiding by some of the best
-practices shown in [`ganhacks`](https://github.com/soumith/ganhacks).
-Namely, we will construct different mini-batches for real and fake
-images, and also adjust G’s objective function to maximize
-$\log (D(G(z)))$. Training is split up into two main parts. Part 1
-updates the Discriminator and Part 2 updates the Generator.
+# Finally, now that we have all of the parts of the GAN framework defined,
+# we can train it. Be mindful that training GANs is somewhat of an art
+# form, as incorrect hyperparameter settings lead to mode collapse with
+# little explanation of what went wrong. Here, we will closely follow
+# Algorithm 1 from Goodfellow’s paper, while abiding by some of the best
+# practices shown in [`ganhacks`](https://github.com/soumith/ganhacks).
+# Namely, we will construct different mini-batches for real and fake
+# images, and also adjust G’s objective function to maximize
+# $\log (D(G(z)))$. Training is split up into two main parts. Part 1
+# updates the Discriminator and Part 2 updates the Generator.
 
 **Part 1: Train the Discriminator**
 
-Recall, the goal of training the discriminator is to maximize the
-probability of correctly classifying a given input as real or fake. In
-terms of Goodfellow, we wish to “update the discriminator by ascending
-its stochastic gradient”. Practically, we want to maximize
-$\log(D(x)) + \log(1-D(G(z)))$. Due to the separate mini-batch
-suggestion from ganhacks, we will calculate this in two steps. First, we
-will construct a batch of real samples from the training set, forward
-pass through $D$, calculate the loss ($\log(D(x))$), then
-calculate the gradients in a backward pass. Secondly, we will construct
-a batch of fake samples with the current generator, forward pass this
-batch through $D$, calculate the loss ($\log(1-D(G(z)))$),
-and *accumulate* the gradients with a backward pass. Now, with the
-gradients accumulated from both the all-real and all-fake batches, we
-call a step of the Discriminator’s optimizer.
+# Recall, the goal of training the discriminator is to maximize the
+# probability of correctly classifying a given input as real or fake. In
+# terms of Goodfellow, we wish to “update the discriminator by ascending
+# its stochastic gradient”. Practically, we want to maximize
+# $\log(D(x)) + \log(1-D(G(z)))$. Due to the separate mini-batch
+# suggestion from ganhacks, we will calculate this in two steps. First, we
+# will construct a batch of real samples from the training set, forward
+# pass through $D$, calculate the loss ($\log(D(x))$), then
+# calculate the gradients in a backward pass. Secondly, we will construct
+# a batch of fake samples with the current generator, forward pass this
+# batch through $D$, calculate the loss ($\log(1-D(G(z)))$),
+# and *accumulate* the gradients with a backward pass. Now, with the
+# gradients accumulated from both the all-real and all-fake batches, we
+# call a step of the Discriminator’s optimizer.
 
 **Part 2: Train the Generator**
 
-As stated in the original paper, we want to train the Generator by
-minimizing $\log(1-D(G(z)))$ in an effort to generate better fakes.
-As mentioned, this was shown by Goodfellow to not provide sufficient
-gradients, especially early in the learning process. As a fix, we
-instead wish to maximize $\log(D(G(z)))$. In the code we accomplish
-this by: classifying the Generator output from Part 1 with the
-Discriminator, computing G’s loss *using real labels as GT*, computing
-G’s gradients in a backward pass, and finally updating G’s parameters
-with an optimizer step. It may seem counter-intuitive to use the real
-labels as GT labels for the loss function, but this allows us to use the
-$\log(x)$ part of the BCELoss (rather than the $\log(1-x)$
-part) which is exactly what we want.
+# As stated in the original paper, we want to train the Generator by
+# minimizing $\log(1-D(G(z)))$ in an effort to generate better fakes.
+# As mentioned, this was shown by Goodfellow to not provide sufficient
+# gradients, especially early in the learning process. As a fix, we
+# instead wish to maximize $\log(D(G(z)))$. In the code we accomplish
+# this by: classifying the Generator output from Part 1 with the
+# Discriminator, computing G’s loss *using real labels as GT*, computing
+# G’s gradients in a backward pass, and finally updating G’s parameters
+# with an optimizer step. It may seem counter-intuitive to use the real
+# labels as GT labels for the loss function, but this allows us to use the
+# $\log(x)$ part of the BCELoss (rather than the $\log(1-x)$
+# part) which is exactly what we want.
 
-Finally, we will do some statistic reporting and at the end of each
-epoch we will push our fixed_noise batch through the generator to
-visually track the progress of G’s training. The training statistics
-reported are:
+# Finally, we will do some statistic reporting and at the end of each
+# epoch we will push our fixed_noise batch through the generator to
+# visually track the progress of G’s training. The training statistics
+# reported are:
 
--  **Loss_D** - discriminator loss calculated as the sum of losses for
-   the all real and all fake batches ($\log(D(x)) + \log(D(G(z)))$).
--  **Loss_G** - generator loss calculated as $\log(D(G(z)))$
--  **D(x)** - the average output (across the batch) of the discriminator
-   for the all real batch. This should start close to 1 then
-   theoretically converge to 0.5 when G gets better. Think about why
-   this is.
--  **D(G(z))** - average discriminator outputs for the all fake batch.
-   The first number is before D is updated and the second number is
-   after D is updated. These numbers should start near 0 and converge to
-   0.5 as G gets better. Think about why this is.
+# -  **Loss_D** - discriminator loss calculated as the sum of losses for
+#    the all real and all fake batches ($\log(D(x)) + \log(D(G(z)))$).
+# -  **Loss_G** - generator loss calculated as $\log(D(G(z)))$
+# -  **D(x)** - the average output (across the batch) of the discriminator
+#    for the all real batch. This should start close to 1 then
+#    theoretically converge to 0.5 when G gets better. Think about why
+#    this is.
+# -  **D(G(z))** - average discriminator outputs for the all fake batch.
+#    The first number is before D is updated and the second number is
+#    after D is updated. These numbers should start near 0 and converge to
+#    0.5 as G gets better. Think about why this is.
 
-**Note:** This step might take a while, depending on how many epochs you
-run and if you removed some data from the dataset.
+# **Note:** This step might take a while, depending on how many epochs you
+# run and if you removed some data from the dataset.
 
 
 # Training Loop
