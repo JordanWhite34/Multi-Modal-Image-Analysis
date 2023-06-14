@@ -14,11 +14,11 @@ The project includes implementing a GAN using the CelebA dataset to generate new
 This repository showcases our approaches, implementations, and results for each problem. It provides detailed code, instructions, and visualizations to reproduce our experiments. The project aims to explore advanced techniques in image analysis, promote understanding of convolutional neural networks, handle imbalanced data scenarios, and delve into the exciting field of generative adversarial networks.
 
 ### Requirements
-Python 3.7 or above
-PyTorch
-torchvision
-Matplotlib
-NumPy
+- Python 3.7 or above
+- PyTorch
+- torchvision
+- Matplotlib
+- NumPy
 Please refer to the individual problem notebooks for specific installation and usage instructions.
 
 ### Acknowledgments
